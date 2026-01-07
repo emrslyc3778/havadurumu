@@ -1,3 +1,4 @@
+from tkinter import messagebox
 import requests
 import tkinter as tk
 from PIL import Image,ImageTk,ImageFilter
@@ -11,6 +12,7 @@ bg_label=tk.Label(ekran)
 bg_label.place(x=0,y=0,relwidth=1,relheight=1)
 bg_label.lower()
 panel=tk.Frame(ekran,bg="white")
+panel.place(x=15,y=15,width=270,height=130)
 panel.place(x=15,y=15,width=270,height=130)
 panel.lift()
 #hava_resimleri={"01":"acık.jpg","02":"azbulutlu.jpg","03":"bulutlu.jpg","09":"yağmur.jpg","13":"kar.jpg"}
@@ -43,25 +45,21 @@ entry1=tk.Entry(panel,font="Arial 12 bold")
 entry1.place(x=10,y=45,width=160,height=28)
 def wheather():
     sehir = entry1.get().strip()
+    if not sehir:
+        messagebox.showerror("HATA","lütfen şehir giriniz")
+        return
     params = {"q": sehir, "appid": key_api, "units": "metric", "lang": "tr"}
     response = requests.get(target_url, params=params)
     x = response.json()
-    description=x["weather"][0]["description"]
-    sıcaklik=x["main"]["temp"]
-    icon=x["weather"][0]["icon"]
-    arkaplan_resimleri(icon)
-
-    if not sehir:
-        havadurumu.config(text="lütfen şehir giriniz")
-        return
-
     if str(x.get("cod"))!="200":
-        havadurumu.config(text=f"HATA :{x.get('message','Bilinmeyen hata')}")
-
-    else:
-        havadurumu.config(text=f'sıcaklık : {sıcaklik} \u00B0C\nhava : {description}',font="Arial 12 bold",bg="white")
+        messagebox.showerror("HATA","Şehir bulunamadı!!")
+        return
+    description = x["weather"][0]["description"]
+    sıcaklik = x["main"]["temp"]
+    icon = x["weather"][0]["icon"]
+    arkaplan_resimleri(icon)
+    havadurumu.config(text=f'sıcaklık : {sıcaklik} \u00B0C\nhava : {description}',font="Arial 12 bold",bg="white")
     havadurumu.place(x=70,y=150)
-
     entry1.delete(0, tk.END)
 
 buton=tk.Button(ekran,text="göster",command=wheather,width=10,height=1)
